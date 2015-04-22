@@ -1,0 +1,26 @@
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+.card {
+    max-width: 100px;
+    display: inline-block;
+    margin: 2px;
+}
+
+.player-panel {
+    width: 100%;
+    padding: 15px;
+    border-bottom: solid 1px #ccc;
+}
+
+.other-panel {
+    padding: 15px;
+}
+
+.other-panel img {
+    position: relative;
+    bottom: 15px;
+    left: 0;
+}

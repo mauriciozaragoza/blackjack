@@ -1,0 +1,35 @@
+<!doctype html>
+<html ng-app="BlackjackApp">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Blackjack</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <link href='http://fonts.googleapis.com/css?family=Roboto:400,400italic,100,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="stylesheets/style.css">
+</head>
+<body ng-controller="MainController">
+    <!--[if lt IE 10]>
+    <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    <div class="player-panel">
+        <a ng-click="getCard()">Hit</a>
+        <a ng-click="">Stand</a>
+        <card ng-repeat="card in currentPlayer.cards" value="card"></card>
+    </div>
+
+    <div class="other-panel" ng-repeat="player in otherPlayers">
+        <card ng-repeat="card in player.cards" value="card"></card>
+    </div>
+
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-socket-io/socket.js"></script>
+
+    <script src="app/main.js"></script>
+    <script src="app/directives/card/card.directive.js"></script>
+</body>
+</html>

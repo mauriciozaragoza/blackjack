@@ -1,6 +1,13 @@
 /**
  * Created by Mauricio on 4/20/2015.
  */
+
+var blackjack = require('./blackjack');
+var game;
+var decks = 1;
+var players = 0;
+game = new blackjack.Game({ decksNumber: decks }); 
+
 'use strict';
 
 angular.module('BlackjackApp', [
@@ -11,7 +18,7 @@ angular.module('BlackjackApp', [
     }])
     .controller('MainController', ['$scope', 'BlackjackSocket', function ($scope, BlackjackSocket) {
         BlackjackSocket.on('connection', function(socket){
-            console.log('a user connected');
+            players ++;
         });
 
         $scope.otherPlayers = [, {

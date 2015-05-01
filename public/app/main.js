@@ -15,7 +15,7 @@ angular.module('BlackjackApp', [
             message: 'something'
         });
 
-        $scope.otherPlayers = [{
+        $scope.players = [{
             cards: [{
                 name: 'flip'
             }, {
@@ -33,36 +33,73 @@ angular.module('BlackjackApp', [
                 color: 'diamonds',
                 value: 2
             }]
-        }];
+        },
+            {
+                cards: [{
+                    name: 'ace',
+                    color: 'spades',
+                    value: 11
+                }, {
+                    name: 'king',
+                    color: 'diamonds',
+                    value: 10
+                }, {
+                    name: '3',
+                    color: 'clubs',
+                    value: 3
+                }, {
+                    name: '2',
+                    color: 'hearts',
+                    value: 2
+                }]
+            },{
+                cards: [{
+                    name: 'flip'
+                }, {
+                    name: 'flip'
+                }, {
+                    name: 'queen',
+                    color: 'clubs',
+                    value: 10
+                }, {
+                    name: '5',
+                    color: 'spades',
+                    value: 5
+                }, {
+                    name: '2',
+                    color: 'diamonds',
+                    value: 2
+                }]
+            },{
+                cards: [{
+                    name: 'flip'
+                }, {
+                    name: 'flip'
+                }, {
+                    name: 'queen',
+                    color: 'clubs',
+                    value: 10
+                }, {
+                    name: '5',
+                    color: 'spades',
+                    value: 5
+                }, {
+                    name: '2',
+                    color: 'diamonds',
+                    value: 2
+                }]
+            }];
 
         $scope.currentPlayerIndex = 1;
-        $scope.currentPlayer = {
-            cards: [{
-                name: 'flip'
-            }, {
-                name: 'flip'
-            }, {
-                name: 'ace',
-                color: 'spades',
-                value: 11
-            }, {
-                name: 'king',
-                color: 'diamonds',
-                value: 10
-            }, {
-                name: '3',
-                color: 'clubs',
-                value: 3
-            }, {
-                name: '2',
-                color: 'hearts',
-                value: 2
-            }]
-        };
+        $scope.currentPlayer = $scope.players[$scope.currentPlayerIndex];
 
         $scope.getCard = function () {
             $scope.currentPlayer.cards.push({
                 name: 'flip'
             });
+        };
+
+        $scope.stand = function () {
+            console.log('stand');
         };
     }]);

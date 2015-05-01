@@ -7,23 +7,30 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,400italic,100,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
     <link rel="stylesheet" href="stylesheets/style.css">
 </head>
 <body ng-controller="MainController">
-    <!--[if lt IE 10]>
-    <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-    <![endif]-->
+    <div class="container-fluid">
+        <!--[if lt IE 10]>
+        <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
 
-    <div class="player-panel">
-        <a ng-click="getCard()">Hit</a>
-        <a ng-click="">Stand</a>
-        <card ng-repeat="card in currentPlayer.cards" value="card"></card>
+        <div class="row player-row">
+            <div class="col-xs-{{12 / players.length}} player-panel" ng-repeat="player in players">
+                <div class="card-container center-block">
+                    <card ng-repeat="card in player.cards" value="card" index="$index"></card>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-3 col-xs-push-{{(12 / players.length) * currentPlayerIndex}}">
+                <a class="btn btn-info" ng-click="getCard()">Hit</a>
+                <a class="btn btn-danger" ng-click="">Stand</a>
+            </div>
+        </div>
     </div>
-
-    <div class="other-panel" ng-repeat="player in otherPlayers">
-        <card ng-repeat="card in player.cards" value="card"></card>
-    </div>
-
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="bower_components/angular/angular.js"></script>

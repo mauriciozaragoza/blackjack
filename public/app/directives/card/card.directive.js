@@ -8,7 +8,8 @@ angular.module('BlackjackApp')
             restrict: 'EA',
             templateUrl: 'app/directives/card/card.html',
             scope: {
-                value: '='
+                value: '=',
+                index: '='
             },
             link: function(scope) {
                 if (scope.value.name !== 'flip') {

@@ -1,7 +1,9 @@
 /**
  * Created by erosespinola on 4/28/2015.
  */
- 
+
+var _ = require('lodash');
+
 var options = {};
 
 //*** Hand Class ***//
@@ -66,13 +68,13 @@ function generateDeck(decksNumber) {
 }
 
 shuffle = function (deck) {
-    for (var j, x, i = deck.length; i; 
-    	j = parseInt(Math.random() * i), 
-    	x = deck[--i], 
-    	deck[i] = deck[j], 
-    	deck[j] = x);
+    //for (var j, x, i = deck.length; i;
+    //	j = parseInt(Math.random() * i),
+    //	x = deck[--i],
+    //	deck[i] = deck[j],
+    //	deck[j] = x);
     	
-    return deck;
+    return _.shuffle(deck);
 };
 
 exports.Game = function (opt) {

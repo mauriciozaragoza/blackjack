@@ -2,29 +2,23 @@
  * Created by Mauricio on 4/20/2015.
  */
 
-var blackjack = require('./blackjack');
-var game;
-var decks = 1;
-var players = 0;
-game = new blackjack.Game({ decksNumber: decks }); 
-
 'use strict';
 
 angular.module('BlackjackApp', [
-        'btford.socket-io'
-    ])
+    'btford.socket-io'
+])
     .factory('BlackjackSocket', ['socketFactory', function (socketFactory) {
         return socketFactory();
     }])
     .controller('MainController', ['$scope', 'BlackjackSocket', function ($scope, BlackjackSocket) {
-        BlackjackSocket.on('connection', function(socket){
-            players ++;
+        BlackjackSocket.emit('chat message', {
+            message: 'something'
         });
 
-        $scope.otherPlayers = [, {
+        $scope.otherPlayers = [{
             cards: [{
                 name: 'flip'
-            },{
+            }, {
                 name: 'flip'
             }, {
                 name: 'queen',
@@ -66,9 +60,9 @@ angular.module('BlackjackApp', [
             }]
         };
 
-        $scope.getCard = function() {
+        $scope.getCard = function () {
             $scope.currentPlayer.cards.push({
-               name: 'flip'
+                name: 'flip'
             });
         };
     }]);

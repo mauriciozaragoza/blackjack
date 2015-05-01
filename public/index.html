@@ -7,7 +7,8 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,400italic,100,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bower_components/fontawesome/css/font-awesome.min.css">
     <link rel="stylesheet" href="stylesheets/style.css">
 </head>
 <body ng-controller="MainController">
@@ -26,8 +27,20 @@
 
         <div class="row">
             <div class="col-xs-3 col-xs-push-{{(12 / players.length) * currentPlayerIndex}}">
-                <a class="btn btn-info" ng-click="getCard()">Hit</a>
-                <a class="btn btn-danger" ng-click="">Stand</a>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <a class="btn btn-lg btn-info" ng-click="getCard()">Hit</a>
+                        <a class="btn btn-lg btn-danger" ng-click="stand()">Stand</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 value-indicator">
+                        <span class="fa-stack">
+                            <i class="fa">{{currentPlayerValue}}</i>
+                            <i ng-show="currentPlayerValue > 21" class="fa fa-ban fa-stack-2x text-danger"></i>
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -35,6 +48,7 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="bower_components/angular/angular.js"></script>
     <script src="bower_components/angular-socket-io/socket.js"></script>
+    <script src="bower_components/lodash/lodash.js"></script>
 
     <script src="app/main.js"></script>
     <script src="app/directives/card/card.directive.js"></script>

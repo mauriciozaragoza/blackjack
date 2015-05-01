@@ -15,6 +15,13 @@ angular.module('BlackjackApp', [
             message: 'something'
         });
 
+        function computeValue() {
+            $scope.currentPlayerValue = _.reduce($scope.currentPlayer.cards, function(total, card) {
+                console.log(card, total);
+                return total + card.value;
+            }, 0);
+        }
+
         $scope.players = [{
             cards: [{
                 name: 'flip'
@@ -39,10 +46,6 @@ angular.module('BlackjackApp', [
                     name: 'ace',
                     color: 'spades',
                     value: 11
-                }, {
-                    name: 'king',
-                    color: 'diamonds',
-                    value: 10
                 }, {
                     name: '3',
                     color: 'clubs',
@@ -92,11 +95,18 @@ angular.module('BlackjackApp', [
 
         $scope.currentPlayerIndex = 1;
         $scope.currentPlayer = $scope.players[$scope.currentPlayerIndex];
+        $scope.currentPlayerValue = 0;
+
+        computeValue();
 
         $scope.getCard = function () {
             $scope.currentPlayer.cards.push({
-                name: 'flip'
+                name: 'ace',
+                color: 'diamonds',
+                value: 1
             });
+
+            computeValue();
         };
 
         $scope.stand = function () {

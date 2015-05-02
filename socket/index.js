@@ -37,7 +37,7 @@ module.exports = function(io) {
             console.log('join', message);
 
             if (_.has(rooms, message.id)) {
-                if (rooms[message.id].started && rooms[message.id].players < 6) {
+                if (!rooms[message.id].started && rooms[message.id].players < 6) {
                     socket.emit('join', {
                         success: false,
                         error: 'The game is full or already started.'

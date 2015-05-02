@@ -7,6 +7,7 @@ var blackjack = require('./blackjack');
 var _ = require('lodash');
 
 var rooms = {};
+var MAX_PLAYERS = 6;
 
 module.exports = function(io) {
     io.on('connection', function (socket) {
@@ -18,7 +19,9 @@ module.exports = function(io) {
 
             var id = _.random(0, 99999);
 
-            // TODO check if room does not exist previously
+            while(_.has(rooms, id)) {
+                id = _.random(0, 99999);
+            }
 
             rooms[id] = {
                 clients: [socket],
@@ -38,7 +41,7 @@ module.exports = function(io) {
             console.log('join', message);
 
             if (_.has(rooms, message.id)) {
-                if (!rooms[message.id].started && rooms[message.id].players < 6) {
+                if (rooms[message.id].started && rooms[message.id].players < MAX_PLAYERS) {
                     socket.emit('join', {
                         success: false,
                         error: 'The game is full or already started.'
@@ -82,25 +85,19 @@ module.exports = function(io) {
                     });
                 });
 
-                var n = 2;
-                var m = 3;
+                var n = 3;
+                var m = rooms[message.id].players;
 
-                var game = new blackjack.Game({ decksNumber: n, playersNumber: m });
-                game.deck.shuffle();
+                rooms[message.id].game  = new blackjack.Game({ decksNumber: n, playersNumber: m });
+                rooms[message.id].game.deck.shuffle();
 
-                game.playersHand[0].dealCard(game.deck.getCard());
-                game.playersHand[1].dealCard(game.deck.getCard());
-                game.playersHand[2].dealCard(game.deck.getCard());
+                for (var i = 0; i < rooms[message.id].game.playersHand.length; i++) {
+                    rooms[message.id].game.playersHand[i].dealCard(rooms[message.id].game.deck.getCard());
+                    rooms[message.id].game.playersHand[i].dealCard(rooms[message.id].game.deck.getCard());
+                }
 
-                game.dealerHand.dealCard(game.deck.getCard());
-
-                console.log("Player 1 score is: " + game.playersHand[0].getScore());
-                console.log("Player 2 score is: " + game.playersHand[1].getScore());
-                console.log("Player 3 score is: " + game.playersHand[2].getScore());
-
-                console.log("Dealer score is: " + game.dealerHand.getScore());
-
-                console.log("Cards remaining: " + game.deck.deckStack.length);
+                rooms[message.id].game.dealerHand.dealCard(rooms[message.id].game.deck.getCard());
+                rooms[message.id].game.dealerHand.dealCard(rooms[message.id].game.deck.getCard());
             }
             else {
                 socket.emit('start', {

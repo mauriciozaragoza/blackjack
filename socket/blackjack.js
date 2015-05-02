@@ -6,12 +6,14 @@ var _ = require('lodash');
 
 var options = {};
 
-//*** Hand Class ***//
+// Hand Class
 
+// Constructor with an empty hand
 function Hand() {
     this.cards = [];
 }
 
+// Get the user's hand score
 Hand.prototype.getScore = function () {
     var s = 0;
     for (var i = 0; i < this.cards.length; i++)
@@ -20,6 +22,7 @@ Hand.prototype.getScore = function () {
     return s;
 };
 
+// T
 Hand.prototype.isBust = function () {
     return this.getScore() > 21;
 };
@@ -27,6 +30,10 @@ Hand.prototype.isBust = function () {
 Hand.prototype.dealCard = function (card) {
     this.cards.push(card);
 };
+
+Hand.prototype.getHand = function () {
+    return this.cards;
+}
 
 //*** Card Class ***//
 

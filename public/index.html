@@ -6,10 +6,18 @@
     <title>Blackjack</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
+
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,400italic,100,700' rel='stylesheet' type='text/css'>
+
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="bower_components/fontawesome/css/font-awesome.min.css">
     <link rel="stylesheet" href="stylesheets/style.css">
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="bower_components/angular/angular.min.js"></script>
+    <script src="bower_components/angular-animate/angular-animate.min.js"></script>
+    <script src="bower_components/angular-socket-io/socket.js"></script>
+    <script src="bower_components/lodash/lodash.js"></script>
 </head>
 <body ng-controller="MainController">
     <div class="container-fluid">
@@ -17,38 +25,39 @@
         <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
 
-        <div class="row player-row">
-            <div class="col-xs-{{12 / players.length}} player-panel" ng-repeat="player in players">
-                <div class="card-container center-block">
-                    <card ng-repeat="card in player.cards" value="card" index="$index"></card>
-                </div>
-            </div>
+        <div class="row filler">
         </div>
-
-        <div class="row">
-            <div class="col-xs-3 col-xs-push-{{(12 / players.length) * currentPlayerIndex}}">
+        <div class="row player-row">
+            <div class="col-xs-{{columnRatio}} player-panel"
+                 ng-repeat="player in Blackjack.players">
                 <div class="row">
                     <div class="col-xs-12">
-                        <a class="btn btn-lg btn-info" ng-click="getCard()">Hit</a>
-                        <a class="btn btn-lg btn-danger" ng-click="stand()">Stand</a>
+                        <div class="card-container center-block">
+                            <card class="animation" ng-repeat="card in player.cards" value="card" index="$index"></card>
+                        </div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-xs-12 value-indicator">
-                        <span class="fa-stack">
-                            <i class="fa">{{currentPlayerValue}}</i>
-                            <i ng-show="currentPlayerValue > 21" class="fa fa-ban fa-stack-2x text-danger"></i>
-                        </span>
+                    <div class="col-xs-12">
+                        <div class="player-number center-block text-center"
+                             ng-class="{'current-player-number': Blackjack.currentPlayerIndex == $index, 'other-player-number': Blackjack.currentPlayerIndex != $index}">
+                            {{$index}}
+                        </div>
+                        <div class="text-center" ng-if="$index == Blackjack.currentPlayerIndex">
+                            <a class="btn btn-lg btn-info" ng-click="Blackjack.hit()">Hit</a>
+                            <a class="btn btn-lg btn-danger" ng-click="Blackjack.stand()">Stand</a>
+                            <div class="center-block value-indicator">
+                                <span class="fa-stack">
+                                    <i class="fa">{{Blackjack.currentPlayer.value}}</i>
+                                    <i ng-show="Blackjack.currentPlayer.value > 21" class="fa fa-ban fa-stack-2x text-danger"></i>
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="bower_components/angular/angular.js"></script>
-    <script src="bower_components/angular-socket-io/socket.js"></script>
-    <script src="bower_components/lodash/lodash.js"></script>
 
     <script src="app/main.js"></script>
     <script src="app/directives/card/card.directive.js"></script>

@@ -4,6 +4,37 @@ body {
     background: #23ab54;
 }
 
+.animation > img {
+    /*border: solid 3px #fff;*/
+}
+
+.animation.ng-enter {
+    -webkit-transition:0.2s linear all;
+    -moz-transition:0.2s linear all;
+    -o-transition:0.2s linear all;
+    transition:0.2s linear all;
+}
+
+.animation.ng-enter.ng-enter-active {
+
+}
+
+.animation.ng-enter > img,
+.animation.ng-move > img {
+    -webkit-transition:0.2s linear all;
+    -moz-transition:0.2s linear all;
+    -o-transition:0.2s linear all;
+    transition:0.2s linear all;
+    opacity: 0;
+    margin-bottom: 300px;
+}
+
+.animation.ng-enter.ng-enter-active > img,
+.animation.ng-move.ng-move-active > img{
+    opacity: 1;
+    margin-bottom: 0;
+}
+
 .card {
     max-width: 100px;
     display: inline-block;
@@ -13,20 +44,38 @@ body {
 }
 
 .player-row {
+    height: 600px;
+    padding: 0 0 50px 0px;
+    bottom: 50px;
+}
+
+.filler {
     height: 300px;
-    /*padding: 15px;*/
-    /*bottom: 50px;*/
-    /*position: absolute;*/
 }
 
 .player-panel {
     position: relative;
-    height: 500px;
     padding: 10px;
 }
 
+.player-number {
+    font-size: 30px;
+    width: 50px;
+    box-shadow: 2px 2px 1px 0px rgba(0,0,0,0.5);
+    margin-bottom: 15px;
+    border-radius: 2px;
+}
+
+.player-number.current-player-number {
+    background: #ffabab;
+}
+
+.player-number.other-player-number {
+    background: #ebebfa;
+}
+
 .card-container {
-    position: absolute;
+    position: relative;
     bottom: 15px;
     border-radius: 10px;
     border: solid 3px #efefef;
@@ -48,3 +97,4 @@ body {
 .btn {
     box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.5);
 }
+

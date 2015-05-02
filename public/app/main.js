@@ -5,24 +5,14 @@
 'use strict';
 
 angular.module('BlackjackApp', [
+    'ngAnimate',
     'btford.socket-io'
 ])
     .factory('BlackjackSocket', ['socketFactory', function (socketFactory) {
         return socketFactory();
     }])
-    .controller('MainController', ['$scope', 'BlackjackSocket', function ($scope, BlackjackSocket) {
-        BlackjackSocket.emit('chat message', {
-            message: 'something'
-        });
-
-        function computeValue() {
-            $scope.currentPlayerValue = _.reduce($scope.currentPlayer.cards, function(total, card) {
-                console.log(card, total);
-                return total + card.value;
-            }, 0);
-        }
-
-        $scope.players = [{
+    .factory('Blackjack', ['BlackjackSocket', '$animate', function (BlackjackSocket, $animate) {
+        var players = [{
             cards: [{
                 name: 'flip'
             }, {
@@ -40,76 +30,109 @@ angular.module('BlackjackApp', [
                 color: 'diamonds',
                 value: 2
             }]
-        },
-            {
-                cards: [{
-                    name: 'ace',
-                    color: 'spades',
-                    value: 11
-                }, {
-                    name: '3',
-                    color: 'clubs',
-                    value: 3
-                }, {
-                    name: '2',
-                    color: 'hearts',
-                    value: 2
-                }]
-            },{
-                cards: [{
-                    name: 'flip'
-                }, {
-                    name: 'flip'
-                }, {
-                    name: 'queen',
-                    color: 'clubs',
-                    value: 10
-                }, {
-                    name: '5',
-                    color: 'spades',
-                    value: 5
-                }, {
-                    name: '2',
-                    color: 'diamonds',
-                    value: 2
-                }]
-            },{
-                cards: [{
-                    name: 'flip'
-                }, {
-                    name: 'flip'
-                }, {
-                    name: 'queen',
-                    color: 'clubs',
-                    value: 10
-                }, {
-                    name: '5',
-                    color: 'spades',
-                    value: 5
-                }, {
-                    name: '2',
-                    color: 'diamonds',
-                    value: 2
-                }]
-            }];
+        }, {
+            cards: [{
+                name: 'ace',
+                color: 'spades',
+                value: 11
+            }, {
+                name: '3',
+                color: 'clubs',
+                value: 3
+            }, {
+                name: '2',
+                color: 'hearts',
+                value: 2
+            }]
+        }, {
+            cards: [{
+                name: 'flip'
+            }, {
+                name: 'flip'
+            }, {
+                name: 'queen',
+                color: 'clubs',
+                value: 10
+            }, {
+                name: '5',
+                color: 'spades',
+                value: 5
+            }, {
+                name: '2',
+                color: 'diamonds',
+                value: 2
+            }]
+        }, {
+            cards: [{
+                name: 'flip'
+            }, {
+                name: 'flip'
+            }, {
+                name: 'queen',
+                color: 'clubs',
+                value: 10
+            }, {
+                name: '5',
+                color: 'spades',
+                value: 5
+            }, {
+                name: '2',
+                color: 'diamonds',
+                value: 2
+            }]
+        }];
 
-        $scope.currentPlayerIndex = 1;
-        $scope.currentPlayer = $scope.players[$scope.currentPlayerIndex];
-        $scope.currentPlayerValue = 0;
+        var currentPlayerIndex = 1;
+        var currentPlayer = players[currentPlayerIndex];
+        var turn = 0;
+
+        BlackjackSocket.emit('chat message', {
+            message: 'something'
+        });
+
+        function computeValue() {
+            currentPlayer.value = _.reduce(currentPlayer.cards, function(total, card) {
+                return total + card.value;
+            }, 0);
+        }
+
+        function changeTurn(index) {
+            turn = index;
+        }
+
+        function addCardTo(card, index) {
+            players[index].cards.push(card);
+
+            if (index == currentPlayerIndex) {
+                computeValue();
+            }
+        }
 
         computeValue();
 
-        $scope.getCard = function () {
-            $scope.currentPlayer.cards.push({
-                name: 'ace',
-                color: 'diamonds',
-                value: 1
-            });
+        return {
+            players: players,
+            currentPlayer: currentPlayer,
+            currentPlayerIndex: currentPlayerIndex,
+            turn: turn,
 
-            computeValue();
-        };
+            hit: function () {
+                console.log('hit');
 
-        $scope.stand = function () {
-            console.log('stand');
+                addCardTo({
+                    name: 'queen',
+                    color: 'clubs',
+                    value: 10
+                }, currentPlayerIndex);
+            },
+
+            stand: function () {
+                console.log('stand');
+            }
         };
+    }])
+    .controller('MainController', ['$scope', 'Blackjack', function ($scope, Blackjack) {
+        $scope.Blackjack = Blackjack;
+
+        $scope.columnRatio = Math.floor(12 / Blackjack.players.length);
     }]);

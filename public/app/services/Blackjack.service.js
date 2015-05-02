@@ -9,24 +9,13 @@ angular.module('BlackjackApp')
     .factory('Blackjack', ['BlackjackSocket', '$rootScope', function (BlackjackSocket, $rootScope) {
         var out = {
             dealer: {
-                cards: [
-                    {
-                        name: 'queen',
-                        color: 'clubs',
-                        value: 10
-                    },
-                    {
-                        name: 'queen',
-                        color: 'clubs',
-                        value: 10
-                    }
-                ]
+                cards: []
             },
             players: [],
             currentPlayer: null,
             currentPlayerIndex: 0,
             playerCount: 1,
-            turn: 0,
+            turn: -1,
 
             // TODO use $q.defer instead?
             roomId: null,
@@ -98,8 +87,15 @@ angular.module('BlackjackApp')
         };
 
         // LISTENERS
+        BlackjackSocket.on('turn', function (message) {
+            out.turn = message.turn;
+        });
 
-        BlackjackSocket.on('hand', function (message) {
+        BlackjackSocket.on('dealerHand', function (message) {
+            out.dealer.cards = message.hand;
+        });
+
+        BlackjackSocket.on('playerHand', function (message) {
             out.players[message.userId].cards = message.hand;
         });
 

@@ -4,34 +4,91 @@
 'use strict';
 
 var blackjack = require('./blackjack');
+var _ = require('lodash');
 
-var n = 1;
-var m = 3;
+var rooms = {};
 
 module.exports = function(io) {
     io.on('connection', function (socket) {
-        //players++;
         console.log('connected');
 
-        var game = new blackjack.Game({ decksNumber: n, playersNumber: m });
-        game.deck.shuffle();
+        // A player chooses 'host game', a room id must be returned
+        socket.on('host', function (){
+            console.log('host');
 
-        game.playersHand[0].dealCard(game.deck.getCard());
-        game.playersHand[1].dealCard(game.deck.getCard());
-        game.playersHand[2].dealCard(game.deck.getCard());
+            var id = _.random(0, 99999);
 
-        game.dealerHand.dealCard(game.deck.getCard());
+            // TODO check if room does not exist previously
 
-        console.log("Player 1 score is: " + game.playersHand[0].getScore());
-        console.log("Player 2 score is: " + game.playersHand[1].getScore());
-        console.log("Player 3 score is: " + game.playersHand[2].getScore());
+            rooms[id] = {
+                clients: [socket],
+                started: false
+            };
 
-        console.log("Dealer score is: " + game.dealerHand.getScore());
+            socket.emit('host', {
+                id: id
+            });
+        });
 
-        console.log("Cards remaining: " + game.deck.deckStack.length);
+        // A player chooses 'join game' and enters a game ID
+        // Returns join success or failure
+        socket.on('join', function (message){
+            console.log('join', message);
 
-        socket.on('chat message', function(msg){
-            console.log(msg);
+            if (_.has(rooms, message.id)) {
+                rooms[message.id].clients.push(socket);
+
+                // TODO check player count limit?
+                // TODO check if game is not started yet
+
+                socket.emit('join', {
+                    success: true
+                });
+            }
+            else {
+                socket.emit('join', {
+                    success: false,
+                    error: 'The game room does not exist.'
+                });
+            }
+        });
+
+        // Starts a game given a room
+        // Should broadcast a start signal to clients in room
+        socket.on('start', function (message) {
+            console.log('start', message);
+
+            if (_.has(rooms, message.id)) {
+                rooms[message.id].started = true;
+
+                // TODO broadcast that the game started
+
+                var n = 1;
+                var m = 3;
+
+                var game = new blackjack.Game({ decksNumber: n, playersNumber: m });
+                game.deck.shuffle();
+
+                game.playersHand[0].dealCard(game.deck.getCard());
+                game.playersHand[1].dealCard(game.deck.getCard());
+                game.playersHand[2].dealCard(game.deck.getCard());
+
+                game.dealerHand.dealCard(game.deck.getCard());
+
+                console.log("Player 1 score is: " + game.playersHand[0].getScore());
+                console.log("Player 2 score is: " + game.playersHand[1].getScore());
+                console.log("Player 3 score is: " + game.playersHand[2].getScore());
+
+                console.log("Dealer score is: " + game.dealerHand.getScore());
+
+                console.log("Cards remaining: " + game.deck.deckStack.length);
+            }
+            else {
+                socket.emit('start', {
+                    success: false,
+                    error: 'The game room does not exist.'
+                });
+            }
         });
     });
 };

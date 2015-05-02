@@ -91,16 +91,23 @@ module.exports = function(io) {
                     rooms[message.id].game.playersHand[i].dealCard(secondCard);
 
                     _.forEach(rooms[message.id].clients, function(n) {
-                        n.emit('hand', {
+                        n.emit('playerHand', {
                             hand: rooms[message.id].game.playersHand[i].getHand(),
                             userId: i
                         });
                     });
                 }
 
-                rooms[message.id].game.dealerHand.dealCard(rooms[message.id].game.deck.getCard());
-                rooms[message.id].game.dealerHand.dealCard(rooms[message.id].game.deck.getCard());
+                var firstDealerCard = rooms[message.id].game.deck.getCard();
+                var secondDealerCard = rooms[message.id].game.deck.getCard();
+                rooms[message.id].game.dealerHand.dealCard(firstDealerCard);
+                rooms[message.id].game.dealerHand.dealCard(secondDealerCard);
 
+                _.forEach(rooms[message.id].clients, function(n) {
+                    n.emit('dealerHand', {
+                        hand: [firstDealerCard, secondDealerCard]
+                    });
+                });
             }
             else {
                 socket.emit('start', {
@@ -112,19 +119,15 @@ module.exports = function(io) {
 
         // A player chooses 'hit' for a new card
         // Broadcast the given card to the room
-        socket.on('hit', function (message){
+        socket.on('hit', function (message) {
             if (_.has(rooms, message.id)) {
-                rooms[message.id].clients.push(socket);
-                rooms[message.id].players++;
-                socket.emit('join', {
-                    success: true,
-                    id: message.id,
-                    playerIndex: rooms[message.id].players - 1
-                });
-
+                var newCard = rooms[message.id].game.deck.getCard();
+                rooms[message.id].game.playersHand[message.userId].dealCard(newCard);
+                
                 _.forEach(rooms[message.id].clients, function(n) {
-                    n.emit('playercount', {
-                        playercount: rooms[message.id].players
+                    n.emit('hit', {
+                        card: newCard,
+                        userId: message.userId
                     });
                 });
             }

@@ -14,10 +14,12 @@
     <link rel="stylesheet" href="stylesheets/style.css">
 
     <script src="/socket.io/socket.io.js"></script>
+
     <script src="bower_components/angular/angular.min.js"></script>
     <script src="bower_components/angular-animate/angular-animate.min.js"></script>
-    <script src="bower_components/angular-socket-io/socket.js"></script>
-    <script src="bower_components/lodash/lodash.js"></script>
+    <script src="bower_components/angular-socket-io/socket.min.js"></script>
+    <script src="bower_components/lodash/lodash.min.js"></script>
+    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 </head>
 <body ng-controller="MainController">
     <div class="container-fluid">
@@ -60,6 +62,11 @@
     </div>
 
     <script src="app/main.js"></script>
+    <script src="app/main.controller.js"></script>
     <script src="app/directives/card/card.directive.js"></script>
+    <script src="app/services/Blackjack.service.js"></script>
+    <script src="app/modals/start.controller.js"></script>
+    <script src="app/modals/host.controller.js"></script>
+    <script src="app/modals/join.controller.js"></script>
 </body>
 </html>

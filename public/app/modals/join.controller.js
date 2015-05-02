@@ -4,10 +4,14 @@
 
 angular.module('BlackjackApp')
     .controller('JoinController', ['$scope', '$modalInstance', 'Blackjack', function ($scope, $modalInstance, Blackjack) {
+        $scope.joined = false;
+        $scope.Blackjack = Blackjack;
+
         $scope.join = function () {
+            console.log($scope.roomId);
             Blackjack.join($scope.roomId, function (data) {
                if (data.success) {
-                   $modalInstance.close(data.id);
+                   $scope.joined = true;
                }
                else {
                    $scope.message = data.error;
@@ -15,7 +19,7 @@ angular.module('BlackjackApp')
             });
         };
 
-        $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
-        };
+        $scope.$on('start', function () {
+            $modalInstance.close('started');
+        })
     }]);

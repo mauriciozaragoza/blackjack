@@ -4,11 +4,13 @@
 
 angular.module('BlackjackApp')
     .controller('HostController', ['$scope', '$modalInstance', 'Blackjack', function ($scope, $modalInstance, Blackjack) {
+        $scope.Blackjack = Blackjack;
+
         Blackjack.host(function (roomId) {
-           $scope.roomId = roomId;
+            $scope.roomId = roomId;
         });
 
         $scope.start = function () {
-            $modalInstance.close('a');
+            Blackjack.start();
         };
     }]);

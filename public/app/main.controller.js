@@ -5,7 +5,14 @@
 angular.module('BlackjackApp')
     .controller('MainController', ['$scope', '$modal', 'Blackjack', function ($scope, $modal, Blackjack) {
         $scope.Blackjack = Blackjack;
-        $scope.columnRatio = Math.floor(12 / Blackjack.players.length);
+        $scope.started = false;
+
+        $scope.$on('start', function () {
+            console.log('game started');
+            $scope.started = true;
+        })
+
+        //$scope.columnRatio = Math.floor(12 / Blackjack.players.length);
 
         $modal.open({
             templateUrl: 'app/modals/start.html',

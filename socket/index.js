@@ -23,7 +23,7 @@ module.exports = function(io) {
             rooms[id] = {
                 clients: [socket],
                 started: false,
-                players: 0
+                players: 1
             };
 
             socket.emit('host', {
@@ -42,13 +42,15 @@ module.exports = function(io) {
                         success: false,
                         error: 'The game is full or already started.'
                     });
-                    return;  
+                    return;
                 }
 
                 rooms[message.id].clients.push(socket);
                 rooms[message.id].players++;
                 socket.emit('join', {
-                    success: true
+                    success: true,
+                    id: message.id,
+                    playerIndex: rooms[message.id].players - 1
                 });
 
                 _.forEach(rooms[message.id].clients, function(n) {

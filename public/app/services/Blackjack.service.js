@@ -32,13 +32,9 @@ angular.module('BlackjackApp')
             roomId: null,
 
             hit: function () {
-                console.log('hit');
-
-                addCardTo({
-                    name: 'queen',
-                    color: 'clubs',
-                    value: 10
-                }, this.currentPlayerIndex);
+                BlackjackSocket.emit('hit', {
+                    userId: out.currentPlayerIndex
+                });
             },
 
             stand: function () {
@@ -101,27 +97,19 @@ angular.module('BlackjackApp')
             }
         };
 
-        function computeValue() {
-            out.currentPlayer.value = _.reduce(out.currentPlayer.cards, function(total, card) {
-                return total + card.value;
-            }, 0);
-        }
+        // LISTENERS
 
-        function addCardTo(card, index) {
-            out.players[index].cards.push(card);
-
-            if (index == out.currentPlayerIndex) {
-                computeValue();
-            }
-        }
+        BlackjackSocket.on('hand', function (message) {
+            out.players[message.userId].cards = message.hand;
+        });
 
         BlackjackSocket.on('playercount', function (message) {
             console.log('playercount', message);
             out.playerCount = message.playercount;
         });
 
-        BlackjackSocket.on('started', function (message) {
-            console.log('started', message);
+        BlackjackSocket.on('start', function (message) {
+            console.log('start', message);
 
             for (var i = 0; i < out.playerCount; i++) {
                 out.players.push({
@@ -132,8 +120,6 @@ angular.module('BlackjackApp')
             out.currentPlayer = out.players[out.currentPlayerIndex];
 
             $rootScope.$broadcast('start');
-
-            computeValue();
         });
 
         return out;

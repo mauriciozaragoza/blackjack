@@ -88,17 +88,6 @@ body {
     width: 120px;
 }
 
-.value-indicator {
-    font-size: 50px;
-    width: 150px;
-    height: 150px;
-    text-align: center;
-
-    /*border-radius: 10px;*/
-    /*border: solid 3px #efefef;*/
-    color: #efefef;
-}
-
 .btn {
     box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.5);
 }

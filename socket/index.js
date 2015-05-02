@@ -112,7 +112,7 @@ module.exports = function(io) {
 
         // A player chooses 'hit' for a new card
         // Broadcast the given card to the room
-        socket.on('hit', function (message){
+        socket.on('hit', function (message) {
             if (_.has(rooms, message.id)) {
                 rooms[message.id].clients.push(socket);
                 rooms[message.id].players++;
@@ -122,7 +122,7 @@ module.exports = function(io) {
                     playerIndex: rooms[message.id].players - 1
                 });
 
-                _.forEach(rooms[message.id].clients, function(n) {
+                _.forEach(rooms[message.id].clients, function (n) {
                     n.emit('playercount', {
                         playercount: rooms[message.id].players
                     });
@@ -135,4 +135,5 @@ module.exports = function(io) {
                 });
             }
         });
+    });
 };

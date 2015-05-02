@@ -51,12 +51,6 @@
                         <div class="text-center" ng-if="$index == Blackjack.currentPlayerIndex">
                             <a class="btn btn-lg btn-info" ng-click="Blackjack.hit()">Hit</a>
                             <a class="btn btn-lg btn-danger" ng-click="Blackjack.stand()">Stand</a>
-                            <div class="center-block value-indicator">
-                                <span class="fa-stack">
-                                    <i class="fa">{{Blackjack.currentPlayer.value}}</i>
-                                    <i ng-show="Blackjack.currentPlayer.value > 21" class="fa fa-ban fa-stack-2x text-danger"></i>
-                                </span>
-                            </div>
                         </div>
                     </div>
                 </div>

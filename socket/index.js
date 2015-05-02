@@ -23,7 +23,8 @@ module.exports = function(io) {
                 clients: [socket],
                 started: false,
                 players: 1,
-                game: null
+                game: null,
+                turn: 0
             };
 
             socket.emit('host', {
@@ -75,6 +76,9 @@ module.exports = function(io) {
                     n.emit('start', {
                         start: true
                     });
+                    n.emit('turn', {
+                        turn: rooms[message.id].turn
+                    });
                 });
 
                 var n = 3;
@@ -108,6 +112,10 @@ module.exports = function(io) {
                         hand: [firstDealerCard, secondDealerCard]
                     });
                 });
+
+                socket.emit('turn', {
+                    turn: rooms[message.id].turn
+                });
             }
             else {
                 socket.emit('start', {
@@ -121,6 +129,10 @@ module.exports = function(io) {
         // Broadcast the given card to the room
         socket.on('hit', function (message) {
             if (_.has(rooms, message.id)) {
+                if (message.userId != rooms[message.id].turn) {
+                    socket.emit('turnError');
+                    return;
+                }
                 var newCard = rooms[message.id].game.deck.getCard();
                 rooms[message.id].game.playersHand[message.userId].dealCard(newCard);
                 
@@ -130,11 +142,38 @@ module.exports = function(io) {
                         userId: message.userId
                     });
                 });
+
+                rooms[message.id].turn = (rooms[message.id].turn + 1) % rooms[message.id].players;
+                socket.emit('turn', {
+                    turn: rooms[message.id].turn
+                });
             }
             else {
                 socket.emit('hit', {
                     success: false,
                     error: 'Hit failed.'
+                });
+            }
+        });
+
+        // A player chooses 'stand' for a new card
+        // Broadcast the given card to the room
+        socket.on('stand', function (message) {
+            if (_.has(rooms, message.id)) {
+                if (message.userId != rooms[message.id].turn) {
+                    socket.emit('turnError');
+                    return;
+                }
+
+                rooms[message.id].turn = (rooms[message.id].turn + 1) % rooms[message.id].players;
+                socket.emit('turn', {
+                    turn: rooms[message.id].turn
+                });
+            }
+            else {
+                socket.emit('stand', {
+                    success: false,
+                    error: 'Stand failed.'
                 });
             }
         });

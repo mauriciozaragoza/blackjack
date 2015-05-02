@@ -30,9 +30,9 @@ Hand.prototype.dealCard = function (card) {
 
 //*** Card Class ***//
 
-function Card(name, suit, value) {
+function Card(name, color, value) {
     this.name = name;
-    this.suit = suit;
+    this.color = color;
     this.value = value;
 }
 
@@ -53,13 +53,13 @@ Deck.prototype.getCard = function() {
 
 function generateDeck(decksNumber) {
     var values = ['Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King'];
-    var suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
+    var colors = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
     var deck = [];
 
     for (var currentDeck = 0; currentDeck < decksNumber; currentDeck++) {
         for (var value = 0; value < values.length; value++) {
-            for (var suit = 0; suit < suits.length; suit++) {
-                deck.push(new Card(values[value], suits[suit], value + 1));
+            for (var color = 0; color < colors.length; color++) {
+                deck.push(new Card(values[value], colors[color], value + 1));
             }
         }
     }
@@ -67,13 +67,7 @@ function generateDeck(decksNumber) {
     return deck;
 }
 
-shuffle = function (deck) {
-    //for (var j, x, i = deck.length; i;
-    //	j = parseInt(Math.random() * i),
-    //	x = deck[--i],
-    //	deck[i] = deck[j],
-    //	deck[j] = x);
-    	
+shuffle = function (deck) {    	
     return _.shuffle(deck);
 };
 

@@ -22,7 +22,8 @@ module.exports = function(io) {
 
             rooms[id] = {
                 clients: [socket],
-                started: false
+                started: false,
+                players: 0
             };
 
             socket.emit('host', {
@@ -36,13 +37,24 @@ module.exports = function(io) {
             console.log('join', message);
 
             if (_.has(rooms, message.id)) {
+                if (!rooms[message.id].started && rooms[message.id].players < 6) {
+                    socket.emit('join', {
+                        success: false,
+                        error: 'The game is full or already started.'
+                    });
+                    return;  
+                }
+
                 rooms[message.id].clients.push(socket);
-
-                // TODO check player count limit?
-                // TODO check if game is not started yet
-
+                rooms[message.id].players++;
                 socket.emit('join', {
                     success: true
+                });
+
+                _.forEach(rooms[message.id].clients, function(n) {
+                    n.emit('playercount', {
+                        playercount: rooms[message.id].players
+                    });
                 });
             }
             else {
@@ -63,7 +75,7 @@ module.exports = function(io) {
 
                 // TODO broadcast that the game started
 
-                var n = 1;
+                var n = 2;
                 var m = 3;
 
                 var game = new blackjack.Game({ decksNumber: n, playersNumber: m });

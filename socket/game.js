@@ -25,3 +25,15 @@ console.log("Dealer score is: " + game.dealerHand.getScore());
 
 console.log("Cards remaining: " + game.deck.deckStack.length);
 
+var _ = require('lodash');
+var rooms = {};
+
+rooms[0] = {
+    clients: ["lol","jiji","wooow"],
+    started: false,
+    players: 3
+};
+
+_.forEach(rooms[0].clients, function(n) {
+    console.log(n);
+});

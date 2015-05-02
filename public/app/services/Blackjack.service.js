@@ -96,7 +96,7 @@ angular.module('BlackjackApp')
         }
 
         function addCardTo(card, index) {
-            players[index].cards.push(card);
+            out.players[index].cards.push(card);
 
             if (index == out.currentPlayerIndex) {
                 computeValue();
@@ -108,12 +108,12 @@ angular.module('BlackjackApp')
             out.playerCount = message.playercount;
         });
 
-        BlackjackSocket.on('gamestart', function (message) {
-            console.log('gamestart', message);
+        BlackjackSocket.on('started', function (message) {
+            console.log('started', message);
 
             $rootScope.$broadcast('start');
 
-            players = [{
+            out.players = [{
                 cards: [{
                     name: 'flip'
                 }, {

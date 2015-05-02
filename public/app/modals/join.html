@@ -2,11 +2,15 @@
     <h3 class="modal-title">Join Game</h3>
 </div>
 <div class="modal-body">
-    Join
-    <input type="number" ng-model="roomId">
-    {{message}}
+    <div ng-hide="joined" class="form-group">
+        <label>Join room</label>
+        <input type="form-control" type="number" ng-model="roomId">
+        {{message}}
+    </div>
+    <div ng-show="joined">
+        {{Blackjack.playerCount}}
+    </div>
 </div>
-<div class="modal-footer">
+<div ng-hide="joined" class="modal-footer">
     <button class="btn btn-primary" ng-click="join()">Join</button>
-    <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
 </div>

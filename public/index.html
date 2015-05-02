@@ -22,11 +22,11 @@
     <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 </head>
 <body ng-controller="MainController">
-    <div class="container-fluid">
-        <!--[if lt IE 10]>
-        <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-        <![endif]-->
+<!--[if lt IE 10]>
+<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+<![endif]-->
 
+    <div class="container-fluid" ng-if="started">
         <div class="row filler">
         </div>
         <div class="row player-row">

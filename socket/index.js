@@ -92,8 +92,19 @@ module.exports = function(io) {
                 rooms[message.id].game.deck.shuffle();
 
                 for (var i = 0; i < rooms[message.id].game.playersHand.length; i++) {
-                    rooms[message.id].game.playersHand[i].dealCard(rooms[message.id].game.deck.getCard());
-                    rooms[message.id].game.playersHand[i].dealCard(rooms[message.id].game.deck.getCard());
+                    var firstCard = rooms[message.id].game.deck.getCard();
+                    var secondCard = rooms[message.id].game.deck.getCard();
+
+                    socket.emit('card', {
+                        success: firstCard
+                    });
+
+                    socket.emit('card', {
+                        success: secondCard
+                    });
+
+                    rooms[message.id].game.playersHand[i].dealCard(firstCard);
+                    rooms[message.id].game.playersHand[i].dealCard(secondCard);
                 }
 
                 rooms[message.id].game.dealerHand.dealCard(rooms[message.id].game.deck.getCard());

@@ -23,6 +23,8 @@ console.log("Player 3 score is: " + game.playersHand[2].getScore());
 
 console.log("Dealer score is: " + game.dealerHand.getScore());
 
+console.log(game.deck.getCard());
+
 console.log("Cards remaining: " + game.deck.deckStack.length);
 
 var _ = require('lodash');

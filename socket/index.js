@@ -11,12 +11,8 @@ var MAX_PLAYERS = 6;
 
 module.exports = function(io) {
     io.on('connection', function (socket) {
-        console.log('connected');
-
         // A player chooses 'host game', a room id must be returned
         socket.on('host', function (){
-            console.log('host');
-
             var id = _.random(0, 99999);
 
             while(_.has(rooms, id)) {
@@ -38,8 +34,6 @@ module.exports = function(io) {
         // A player chooses 'join game' and enters a game ID
         // Returns join success or failure
         socket.on('join', function (message){
-            console.log('join', message);
-
             if (_.has(rooms, message.id)) {
                 if (rooms[message.id].started && rooms[message.id].players < MAX_PLAYERS) {
                     socket.emit('join', {
@@ -74,14 +68,12 @@ module.exports = function(io) {
         // Starts a game given a room
         // Should broadcast a start signal to clients in room
         socket.on('start', function (message) {
-            console.log('start', message);
-
             if (_.has(rooms, message.id)) {
                 rooms[message.id].started = true;
 
                 _.forEach(rooms[message.id].clients, function(n) {
-                    n.emit('started', {
-                        started: true
+                    n.emit('start', {
+                        start: true
                     });
                 });
 
@@ -95,20 +87,20 @@ module.exports = function(io) {
                     var firstCard = rooms[message.id].game.deck.getCard();
                     var secondCard = rooms[message.id].game.deck.getCard();
 
-                    socket.emit('card', {
-                        success: firstCard
-                    });
-
-                    socket.emit('card', {
-                        success: secondCard
-                    });
-
                     rooms[message.id].game.playersHand[i].dealCard(firstCard);
                     rooms[message.id].game.playersHand[i].dealCard(secondCard);
+
+                    _.forEach(rooms[message.id].clients, function(n) {
+                        n.emit('hand', {
+                            hand: rooms[message.id].game.playersHand[i].getHand(),
+                            userId: i
+                        });
+                    });
                 }
 
                 rooms[message.id].game.dealerHand.dealCard(rooms[message.id].game.deck.getCard());
                 rooms[message.id].game.dealerHand.dealCard(rooms[message.id].game.deck.getCard());
+
             }
             else {
                 socket.emit('start', {
@@ -117,5 +109,30 @@ module.exports = function(io) {
                 });
             }
         });
-    });
+
+        // A player chooses 'hit' for a new card
+        // Broadcast the given card to the room
+        socket.on('hit', function (message){
+            if (_.has(rooms, message.id)) {
+                rooms[message.id].clients.push(socket);
+                rooms[message.id].players++;
+                socket.emit('join', {
+                    success: true,
+                    id: message.id,
+                    playerIndex: rooms[message.id].players - 1
+                });
+
+                _.forEach(rooms[message.id].clients, function(n) {
+                    n.emit('playercount', {
+                        playercount: rooms[message.id].players
+                    });
+                });
+            }
+            else {
+                socket.emit('hit', {
+                    success: false,
+                    error: 'Hit failed.'
+                });
+            }
+        });
 };

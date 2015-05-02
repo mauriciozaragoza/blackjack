@@ -37,7 +37,8 @@
                  ng-repeat="player in Blackjack.players">
                 <div class="row">
                     <div class="col-xs-12">
-                        <div class="card-container center-block">
+                        <div class="card-container center-block"
+                             ng-class="{turn: Blackjack.turn == $index}">
                             <card class="animation" ng-repeat="card in player.cards" value="card" index="$index"></card>
                         </div>
                     </div>

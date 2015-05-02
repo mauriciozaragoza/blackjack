@@ -35,6 +35,10 @@ body {
     margin-bottom: 0;
 }
 
+.turn {
+    background: #ff0000;
+}
+
 .card {
     max-width: 100px;
     display: inline-block;

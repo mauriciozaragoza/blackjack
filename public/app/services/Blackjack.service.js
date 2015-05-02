@@ -8,23 +8,33 @@ angular.module('BlackjackApp')
     }])
     .factory('Blackjack', ['BlackjackSocket', '$rootScope', function (BlackjackSocket, $rootScope) {
         var out = {
-            players: players,
+            dealer: {
+                cards: [
+                    {
+                        name: 'queen',
+                        color: 'clubs',
+                        value: 10
+                    },
+                    {
+                        name: 'queen',
+                        color: 'clubs',
+                        value: 10
+                    }
+                ]
+            },
+            players: [],
             currentPlayer: null,
             currentPlayerIndex: 0,
-            playerCount: 0,
+            playerCount: 1,
             turn: 0,
 
             // TODO use $q.defer instead?
             roomId: null,
 
             hit: function () {
-                console.log('hit');
-
-                addCardTo({
-                    name: 'queen',
-                    color: 'clubs',
-                    value: 10
-                }, this.currentPlayerIndex);
+                BlackjackSocket.emit('hit', {
+                    userId: out.currentPlayerIndex
+                });
             },
 
             stand: function () {
@@ -87,103 +97,29 @@ angular.module('BlackjackApp')
             }
         };
 
-        var players = [];
+        // LISTENERS
 
-        function computeValue() {
-            out.currentPlayer.value = _.reduce(out.currentPlayer.cards, function(total, card) {
-                return total + card.value;
-            }, 0);
-        }
-
-        function addCardTo(card, index) {
-            players[index].cards.push(card);
-
-            if (index == out.currentPlayerIndex) {
-                computeValue();
-            }
-        }
+        BlackjackSocket.on('hand', function (message) {
+            out.players[message.userId].cards = message.hand;
+        });
 
         BlackjackSocket.on('playercount', function (message) {
             console.log('playercount', message);
             out.playerCount = message.playercount;
         });
 
-        BlackjackSocket.on('gamestart', function (message) {
-            console.log('gamestart', message);
+        BlackjackSocket.on('start', function (message) {
+            console.log('start', message);
+
+            for (var i = 0; i < out.playerCount; i++) {
+                out.players.push({
+                    cards: []
+                });
+            }
+
+            out.currentPlayer = out.players[out.currentPlayerIndex];
 
             $rootScope.$broadcast('start');
-
-            players = [{
-                cards: [{
-                    name: 'flip'
-                }, {
-                    name: 'flip'
-                }, {
-                    name: 'queen',
-                    color: 'clubs',
-                    value: 10
-                }, {
-                    name: '5',
-                    color: 'spades',
-                    value: 5
-                }, {
-                    name: '2',
-                    color: 'diamonds',
-                    value: 2
-                }]
-            }, {
-                cards: [{
-                    name: 'ace',
-                    color: 'spades',
-                    value: 11
-                }, {
-                    name: '3',
-                    color: 'clubs',
-                    value: 3
-                }, {
-                    name: '2',
-                    color: 'hearts',
-                    value: 2
-                }]
-            }, {
-                cards: [{
-                    name: 'flip'
-                }, {
-                    name: 'flip'
-                }, {
-                    name: 'queen',
-                    color: 'clubs',
-                    value: 10
-                }, {
-                    name: '5',
-                    color: 'spades',
-                    value: 5
-                }, {
-                    name: '2',
-                    color: 'diamonds',
-                    value: 2
-                }]
-            }, {
-                cards: [{
-                    name: 'flip'
-                }, {
-                    name: 'flip'
-                }, {
-                    name: 'queen',
-                    color: 'clubs',
-                    value: 10
-                }, {
-                    name: '5',
-                    color: 'spades',
-                    value: 5
-                }, {
-                    name: '2',
-                    color: 'diamonds',
-                    value: 2
-                }]
-            }];
-
-            computeValue();
         });
 
         return out;

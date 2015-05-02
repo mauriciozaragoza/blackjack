@@ -9,14 +9,11 @@ angular.module('BlackjackApp')
             templateUrl: 'app/directives/card/card.html',
             scope: {
                 value: '=',
-                index: '='
+                index: '=',
+                horizontal: '='
             },
             link: function(scope) {
-                if (scope.value.name !== 'flip') {
-                    scope.image = scope.value.name + '_of_' + scope.value.color + '.svg';
-                } else {
-                    scope.image = 'flip.png';
-                }
+                scope.image = scope.value.name + '_of_' + scope.value.color + '.svg';
             }
         };
     }]);

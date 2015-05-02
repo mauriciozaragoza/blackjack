@@ -1,3 +1,8 @@
-<img class="card"
+<img ng-if="!horizontal"
+     class="card"
      ng-src="images/cards/{{image}}"
      style="left:{{index * 25 + 8}}px; bottom:{{index * 25 + 5}}px;z-index:{{index * 100}}">
+<img ng-if="horizontal"
+     class="horizontal-card"
+     ng-src="images/cards/{{image}}"
+     style="left:{{index * 50 + 8}}px; z-index:{{index * 100}}">

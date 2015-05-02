@@ -13,4 +13,8 @@ angular.module('BlackjackApp')
         $scope.start = function () {
             Blackjack.start();
         };
+
+        $scope.$on('start', function () {
+            $modalInstance.close();
+        });
     }]);

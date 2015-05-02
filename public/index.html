@@ -27,7 +27,10 @@
 <![endif]-->
 
     <div class="container-fluid" ng-if="started">
-        <div class="row filler">
+        <div class="row dealer-panel">
+            <div class="col-xs-12 text-center center-block">
+                <card class="animation" ng-repeat="card in Blackjack.dealer.cards" value="card" index="$index" horizontal="true"></card>
+            </div>
         </div>
         <div class="row player-row">
             <div class="col-xs-{{columnRatio}} player-panel"
@@ -48,12 +51,6 @@
                         <div class="text-center" ng-if="$index == Blackjack.currentPlayerIndex">
                             <a class="btn btn-lg btn-info" ng-click="Blackjack.hit()">Hit</a>
                             <a class="btn btn-lg btn-danger" ng-click="Blackjack.stand()">Stand</a>
-                            <div class="center-block value-indicator">
-                                <span class="fa-stack">
-                                    <i class="fa">{{Blackjack.currentPlayer.value}}</i>
-                                    <i ng-show="Blackjack.currentPlayer.value > 21" class="fa fa-ban fa-stack-2x text-danger"></i>
-                                </span>
-                            </div>
                         </div>
                     </div>
                 </div>

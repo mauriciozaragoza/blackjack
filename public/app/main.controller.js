@@ -10,9 +10,8 @@ angular.module('BlackjackApp')
         $scope.$on('start', function () {
             console.log('game started');
             $scope.started = true;
-        })
-
-        //$scope.columnRatio = Math.floor(12 / Blackjack.players.length);
+            $scope.columnRatio = Math.floor(12 / Blackjack.playerCount);
+        });
 
         $modal.open({
             templateUrl: 'app/modals/start.html',
@@ -36,7 +35,5 @@ angular.module('BlackjackApp')
                         });
                         break;
                 }
-            }, function () {
-                //$log.info('Modal dismissed at: ' + new Date());
             });
     }]);

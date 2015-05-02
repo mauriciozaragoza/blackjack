@@ -112,10 +112,6 @@ module.exports = function(io) {
                         hand: [firstDealerCard, secondDealerCard]
                     });
                 });
-
-                socket.emit('turn', {
-                    turn: rooms[message.id].turn
-                });
             }
             else {
                 socket.emit('start', {
@@ -126,7 +122,7 @@ module.exports = function(io) {
         });
 
         // A player chooses 'hit' for a new card
-        // Broadcast the given card to the room
+        // Broadcast the given card to the room and the next turn
         socket.on('hit', function (message) {
             if (_.has(rooms, message.id)) {
                 if (message.userId != rooms[message.id].turn) {
@@ -144,8 +140,10 @@ module.exports = function(io) {
                 });
 
                 rooms[message.id].turn = (rooms[message.id].turn + 1) % rooms[message.id].players;
-                socket.emit('turn', {
-                    turn: rooms[message.id].turn
+                _.forEach(rooms[message.id].clients, function(n) {
+                    n.emit('turn', {
+                        turn: rooms[message.id].turn
+                    });
                 });
             }
             else {
@@ -156,8 +154,8 @@ module.exports = function(io) {
             }
         });
 
-        // A player chooses 'stand' for a new card
-        // Broadcast the given card to the room
+        // A player chooses 'stand' skip his turn
+        // Broadcast the next turn
         socket.on('stand', function (message) {
             if (_.has(rooms, message.id)) {
                 if (message.userId != rooms[message.id].turn) {
@@ -166,8 +164,10 @@ module.exports = function(io) {
                 }
 
                 rooms[message.id].turn = (rooms[message.id].turn + 1) % rooms[message.id].players;
-                socket.emit('turn', {
-                    turn: rooms[message.id].turn
+                _.forEach(rooms[message.id].clients, function(n) {
+                    n.emit('turn', {
+                        turn: rooms[message.id].turn
+                    });
                 });
             }
             else {

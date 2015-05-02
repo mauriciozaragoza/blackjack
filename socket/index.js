@@ -23,7 +23,8 @@ module.exports = function(io) {
             rooms[id] = {
                 clients: [socket],
                 started: false,
-                players: 0
+                players: 0,
+                game: null
             };
 
             socket.emit('host', {
@@ -73,7 +74,11 @@ module.exports = function(io) {
             if (_.has(rooms, message.id)) {
                 rooms[message.id].started = true;
 
-                // TODO broadcast that the game started
+                _.forEach(rooms[message.id].clients, function(n) {
+                    n.emit('started', {
+                        started: true
+                    });
+                });
 
                 var n = 2;
                 var m = 3;

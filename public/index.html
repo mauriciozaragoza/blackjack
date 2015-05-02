@@ -27,7 +27,10 @@
 <![endif]-->
 
     <div class="container-fluid" ng-if="started">
-        <div class="row filler">
+        <div class="row dealer-panel">
+            <div class="col-xs-12 text-center center-block">
+                <card class="animation" ng-repeat="card in Blackjack.dealer.cards" value="card" index="$index" horizontal="true"></card>
+            </div>
         </div>
         <div class="row player-row">
             <div class="col-xs-{{columnRatio}} player-panel"

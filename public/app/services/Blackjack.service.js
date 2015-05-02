@@ -8,10 +8,24 @@ angular.module('BlackjackApp')
     }])
     .factory('Blackjack', ['BlackjackSocket', '$rootScope', function (BlackjackSocket, $rootScope) {
         var out = {
-            players: players,
+            dealer: {
+                cards: [
+                    {
+                        name: 'queen',
+                        color: 'clubs',
+                        value: 10
+                    },
+                    {
+                        name: 'queen',
+                        color: 'clubs',
+                        value: 10
+                    }
+                ]
+            },
+            players: [],
             currentPlayer: null,
             currentPlayerIndex: 0,
-            playerCount: 0,
+            playerCount: 1,
             turn: 0,
 
             // TODO use $q.defer instead?
@@ -87,8 +101,6 @@ angular.module('BlackjackApp')
             }
         };
 
-        var players = [];
-
         function computeValue() {
             out.currentPlayer.value = _.reduce(out.currentPlayer.cards, function(total, card) {
                 return total + card.value;
@@ -111,77 +123,15 @@ angular.module('BlackjackApp')
         BlackjackSocket.on('started', function (message) {
             console.log('started', message);
 
-            $rootScope.$broadcast('start');
+            for (var i = 0; i < out.playerCount; i++) {
+                out.players.push({
+                    cards: []
+                });
+            }
 
-            out.players = [{
-                cards: [{
-                    name: 'flip'
-                }, {
-                    name: 'flip'
-                }, {
-                    name: 'queen',
-                    color: 'clubs',
-                    value: 10
-                }, {
-                    name: '5',
-                    color: 'spades',
-                    value: 5
-                }, {
-                    name: '2',
-                    color: 'diamonds',
-                    value: 2
-                }]
-            }, {
-                cards: [{
-                    name: 'ace',
-                    color: 'spades',
-                    value: 11
-                }, {
-                    name: '3',
-                    color: 'clubs',
-                    value: 3
-                }, {
-                    name: '2',
-                    color: 'hearts',
-                    value: 2
-                }]
-            }, {
-                cards: [{
-                    name: 'flip'
-                }, {
-                    name: 'flip'
-                }, {
-                    name: 'queen',
-                    color: 'clubs',
-                    value: 10
-                }, {
-                    name: '5',
-                    color: 'spades',
-                    value: 5
-                }, {
-                    name: '2',
-                    color: 'diamonds',
-                    value: 2
-                }]
-            }, {
-                cards: [{
-                    name: 'flip'
-                }, {
-                    name: 'flip'
-                }, {
-                    name: 'queen',
-                    color: 'clubs',
-                    value: 10
-                }, {
-                    name: '5',
-                    color: 'spades',
-                    value: 5
-                }, {
-                    name: '2',
-                    color: 'diamonds',
-                    value: 2
-                }]
-            }];
+            out.currentPlayer = out.players[out.currentPlayerIndex];
+
+            $rootScope.$broadcast('start');
 
             computeValue();
         });

@@ -52,7 +52,7 @@ Hand.prototype.getHand = function () {
     return this.cards;
 }
 
-//*** Card Class ***//
+// Card Class
 
 // Constructor of a card with the given name, color and value
 function Card(name, color, value) {
@@ -61,7 +61,7 @@ function Card(name, color, value) {
     this.value = value;
 }
 
-//*** Deck Class ***//
+// Deck Class
 
 // Constructor of a deck with options.deckNumber number of decks
 function Deck() {

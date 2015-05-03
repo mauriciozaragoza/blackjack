@@ -23,7 +23,7 @@ Hand.prototype.getScore = function () {
 };
 
 // Change the user's hand ases from value 11 to 1
-Hand.prototype.changeAses = function () {
+Hand.prototype.changeAces = function () {
     for (var i = 0; i < this.cards.length; i++) {
         if(this.cards[i].value == 11) {
             this.cards[i].value == 1;

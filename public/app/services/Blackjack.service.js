@@ -92,18 +92,22 @@ angular.module('BlackjackApp')
 
         // LISTENERS
         BlackjackSocket.on('winner', function (message) {
+            console.log('winner', message);
             toaster.pop('success', 'Winner', 'Player ' + (message.userId + 1) + ' has won!');
         });
 
         BlackjackSocket.on('winnerDealer', function (message) {
+            console.log('winnerDealer', message);
             toaster.pop('error', 'You Lose', 'The dealer has won!');
         });
 
         BlackjackSocket.on('blackjack', function (message) {
+            console.log('blackjack', message);
             toaster.pop('success', 'Blackjack', 'Player ' + (message.userId + 1) + ' has won!');
         });
 
         BlackjackSocket.on('bust', function (message) {
+            console.log('bust', message);
             toaster.pop('error', 'Busted', 'Player ' + (message.userId + 1) + ' has been busted!');
         });
 
@@ -113,10 +117,12 @@ angular.module('BlackjackApp')
         });
 
         BlackjackSocket.on('turnError', function () {
+            console.log('turnError');
             toaster.pop('error', 'It\'s not your turn');
         });
 
         BlackjackSocket.on('dealerHand', function (message) {
+            console.log('dealerHand', message);
             out.dealer.cards = message.hand;
         });
 

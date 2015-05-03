@@ -25,7 +25,7 @@ module.exports = function (io) {
                 players: 1,
                 game: null,
                 turn: 0,
-                lastHit: 0
+                standCount: 0
             };
 
             socket.emit('host', {
@@ -129,7 +129,11 @@ module.exports = function (io) {
         // Broadcast the given card to the room and the next turn
         socket.on('hit', function (message) {
             if (_.has(rooms, message.id)) {
-                var room = rooms[message.id];
+                var room = rooms[message.id],
+                    hand = room.game.playersHand[message.userId];
+
+                // Reset stand counter
+                room.standCount = 0;
 
                 // If not your turn return
                 if (message.userId != room.turn) {
@@ -139,40 +143,39 @@ module.exports = function (io) {
 
                 // Deal a card for the player
                 var newCard = room.game.deck.getCard();
-                room.game.playersHand[message.userId].dealCard(newCard);
+                hand.dealCard(newCard);
 
                 // Broadcast the given card
                 broadcast(room, 'playerHand', {
-                    hand: room.game.playersHand[message.userId].getHand(),
+                    hand: hand.getHand(),
                     userId: message.userId
                 });
 
                 // Check if the player is busted and broadcast it if so
-                if (room.game.playersHand[message.userId].isBust()) {
-                    room.game.playersHand[message.userId].changeAses();
+                if (hand.isBust()) {
+                    hand.changeAces();
 
-                    if (room.game.playersHand[message.userId].isBust()) {
+                    if (hand.isBust()) {
                         broadcast(room, 'bust', {
                             userId: message.userId
                         });
+
+                        // Remove player from count
+                        room.players--;
                     }
                 }
 
                 // Check if the player has a blackjack and broadcast it if so
-                if (room.game.playersHand[message.userId].isBlackJack()) {
-                    broadcast(room, 'blackjack', {
-                        userId: message.userId
-                    });
+                if (hand.isBlackJack()) {
+                    blackjackPlayer(message.userId, room, message.id);
                 }
 
-                nextTurn(room);
-
-                room.lastHit = message.userId;
+                nextTurn(room, message.id);
             }
             else {
                 socket.emit('hit', {
                     success: false,
-                    error: 'Hit failed.'
+                    error: 'The game room does not exist.'
                 });
             }
         });
@@ -188,56 +191,63 @@ module.exports = function (io) {
                     return;
                 }
 
-                nextTurn(room);
+                // Increment room stand counter
+                room.standCount++;
+
+                nextTurn(room, message.id);
 
                 // If all stood check winner
-                if (room.lastHit == room.turn) {
-                    var results = [];
+                if (room.standCount == room.players) {
+                    var results = _.map(room.game.playersHand, function (hand) {
+                        var playerScore = hand.getScore();
 
-                    for (var i = 0; i < room.game.playersHand.length; i++) {
-                        results.push(21 - room.game.playersHand[i].getScore());
-                    }
+                        if (playerScore > 21) {
+                            playerScore = -1;
+                        }
+
+                        return playerScore;
+                    });
 
                     var index = 0;
-                    var value = results[0];
-                    for (var i = 1; i < results.length; i++) {
-                        if (results[i] < value) {
-                            value = results[i];
+                    var maxScore = results[0];
+                    _.each(results, function (result, i) {
+                        if (result > maxScore) {
+                            maxScore = result;
                             index = i;
                         }
-                    }
+                    });
 
-                    if (results[index] < (21 - room.game.dealerHand.getScore())) {
+                    if (results[index] > room.game.dealerHand.getScore()) {
                         // Broadcast winner
-                        broadcast(room, 'winner', {
-                            userId: index
-                        });
+                        winnerPlayer(index, room, message.id);
                     } else {
                         // Broadcast winner
-                        broadcast(room, 'winnerDealer');
+                        winnerDealer(room, message.id);
                     }
                 }
             }
             else {
                 socket.emit('stand', {
                     success: false,
-                    error: 'Stand failed.'
+                    error: 'The game room does not exist.'
                 });
             }
         });
     });
 };
 
-function nextTurn(room) {
-    var startingTurn = room.turn;
+function nextTurn(room, id) {
+    var turnsSkipped = 0;
 
     do {
-        room.turn = (room.turn + 1) % room.players;
+        room.turn = (room.turn + 1) % room.clients.length;
 
-        if (startingTurn == room.turn) {            // All players went bust
-            broadcast(room, 'winnerDealer');
+        if (turnsSkipped >= room.players) {            // All players went bust
+            winnerDealer(room, id);
             return false;
         }
+
+        turnsSkipped++;
     } while (room.game.playersHand[room.turn].isBust());
 
     broadcast(room, 'turn', {
@@ -247,8 +257,34 @@ function nextTurn(room) {
     return true;
 }
 
+function winnerDealer(room, id) {
+    broadcast(room, 'winnerDealer');
+
+    deleteRoom(id);
+}
+
+function winnerPlayer(playerIndex, room, id) {
+    broadcast(room, 'winner', {
+        userId: playerIndex
+    });
+
+    deleteRoom(id);
+}
+
+function blackjackPlayer(playerIndex, room, id) {
+    broadcast(room, 'blackjack', {
+        userId: playerIndex
+    });
+
+    deleteRoom(id);
+}
+
 function broadcast(room, tag, payload) {
     _.forEach(room.clients, function (client) {
         client.emit(tag, payload);
     });
+}
+
+function deleteRoom(id) {
+    delete rooms[id];
 }

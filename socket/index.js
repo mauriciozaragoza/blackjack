@@ -36,6 +36,7 @@ module.exports = function(io) {
         // Returns join success or failure
         socket.on('join', function (message){
             if (_.has(rooms, message.id)) {
+                // Send notification if the room is full or the game is already started
                 if (rooms[message.id].started && rooms[message.id].players < MAX_PLAYERS) {
                     socket.emit('join', {
                         success: false,
@@ -44,6 +45,7 @@ module.exports = function(io) {
                     return;
                 }
 
+                // Add the player to clients
                 rooms[message.id].clients.push(socket);
                 rooms[message.id].players++;
                 socket.emit('join', {
@@ -52,6 +54,7 @@ module.exports = function(io) {
                     playerIndex: rooms[message.id].players - 1
                 });
 
+                // Broadcast number of players
                 _.forEach(rooms[message.id].clients, function(n) {
                     n.emit('playercount', {
                         playercount: rooms[message.id].players
@@ -72,6 +75,7 @@ module.exports = function(io) {
             if (_.has(rooms, message.id)) {
                 rooms[message.id].started = true;
 
+                // Broadcast that game started and next turn
                 _.forEach(rooms[message.id].clients, function(n) {
                     n.emit('start', {
                         start: true
@@ -84,9 +88,11 @@ module.exports = function(io) {
                 var n = 3;
                 var m = rooms[message.id].players;
 
+                // Create game with 3 decks and m players
                 rooms[message.id].game  = new blackjack.Game({ decksNumber: n, playersNumber: m });
                 rooms[message.id].game.deck.shuffle();
 
+                // Deal 2 cards to everyplayer
                 for (var i = 0; i < rooms[message.id].game.playersHand.length; i++) {
                     var firstCard = rooms[message.id].game.deck.getCard();
                     var secondCard = rooms[message.id].game.deck.getCard();
@@ -94,6 +100,7 @@ module.exports = function(io) {
                     rooms[message.id].game.playersHand[i].dealCard(firstCard);
                     rooms[message.id].game.playersHand[i].dealCard(secondCard);
 
+                    // Broadcast player's hand
                     _.forEach(rooms[message.id].clients, function(n) {
                         n.emit('playerHand', {
                             hand: rooms[message.id].game.playersHand[i].getHand(),
@@ -102,11 +109,13 @@ module.exports = function(io) {
                     });
                 }
 
+                // Deal 2 card for dealer
                 var firstDealerCard = rooms[message.id].game.deck.getCard();
                 var secondDealerCard = rooms[message.id].game.deck.getCard();
                 rooms[message.id].game.dealerHand.dealCard(firstDealerCard);
                 rooms[message.id].game.dealerHand.dealCard(secondDealerCard);
 
+                // Broadcast dealer's hand
                 _.forEach(rooms[message.id].clients, function(n) {
                     n.emit('dealerHand', {
                         hand: [firstDealerCard, secondDealerCard]
@@ -125,13 +134,17 @@ module.exports = function(io) {
         // Broadcast the given card to the room and the next turn
         socket.on('hit', function (message) {
             if (_.has(rooms, message.id)) {
+                // If not your turn return
                 if (message.userId != rooms[message.id].turn) {
                     socket.emit('turnError');
                     return;
                 }
+
+                // Deal a card for the player
                 var newCard = rooms[message.id].game.deck.getCard();
                 rooms[message.id].game.playersHand[message.userId].dealCard(newCard);
                 
+                // Broadcast the given card
                 _.forEach(rooms[message.id].clients, function(n) {
                     n.emit('hit', {
                         card: newCard,
@@ -139,6 +152,29 @@ module.exports = function(io) {
                     });
                 });
 
+                // Check if the player is busted and broadcast it if so
+                if (rooms[message.id].game.playersHand[message.userId].isBust()) {
+                    rooms[message.id].game.playersHand[message.userId].changeAses();
+
+                    if (rooms[message.id].game.playersHand[message.userId].isBust()) {
+                        _.forEach(rooms[message.id].clients, function(n) {
+                            n.emit('bust', {
+                                userId: message.userId
+                            });
+                        });
+                    }
+                }
+                
+                // Check if the player has a blackjack and broadcast it if so
+                if (rooms[message.id].game.playersHand[message.userId].isBlackJack()) {
+                    _.forEach(rooms[message.id].clients, function(n) {
+                        n.emit('blackjack', {
+                            userId: message.userId
+                        });
+                    });
+                }
+
+                // Broadcast next turn
                 rooms[message.id].turn = (rooms[message.id].turn + 1) % rooms[message.id].players;
                 _.forEach(rooms[message.id].clients, function(n) {
                     n.emit('turn', {
@@ -163,6 +199,7 @@ module.exports = function(io) {
                     return;
                 }
 
+                // Broadcast next turn
                 rooms[message.id].turn = (rooms[message.id].turn + 1) % rooms[message.id].players;
                 _.forEach(rooms[message.id].clients, function(n) {
                     n.emit('turn', {

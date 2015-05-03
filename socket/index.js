@@ -24,7 +24,8 @@ module.exports = function(io) {
                 started: false,
                 players: 1,
                 game: null,
-                turn: 0
+                turn: 0, 
+                lastStand: null
             };
 
             socket.emit('host', {
@@ -177,8 +178,17 @@ module.exports = function(io) {
                 // Broadcast next turn
                 var c = 1;
                 rooms[message.id].turn = (rooms[message.id].turn + c) % rooms[message.id].players;
+                var lastTurn = rooms[message.id].turn; 
                 while (rooms[message.id].game.playersHand[rooms[message.id].turn].isBust()) {
                     rooms[message.id].turn = (rooms[message.id].turn + c) % rooms[message.id].players;
+
+                    if (lastTurn == rooms[message.id].turn) {
+                        _.forEach(rooms[message.id].clients, function(n) {
+                            n.emit('winnerDealer');
+                        });
+                        return;
+                    }
+
                     c++;
                 }
                 _.forEach(rooms[message.id].clients, function(n) {
@@ -204,6 +214,39 @@ module.exports = function(io) {
                     return;
                 }
 
+                // If all stood check winner
+                var results = [];
+                if (rooms[message.id].lastStand == message.userId) {
+                    for (var i = 0; i < rooms[message.id].game.playersHand.length; i++) {
+                        results.push(21 - rooms[message.id].game.playersHand[i].getScore());
+                    }
+
+                    var index = 0;
+                    var value = results[0];
+                    for (var i = 1; i < results.length; i++) {
+                        if (results[i] < value) {
+                            value = results[i];
+                            index = i;
+                        }
+                    }
+
+                    if (results[index] < (21 - rooms[message.id].game.dealerHand.getScore())) {
+                        // Broadcast winner
+                        _.forEach(rooms[message.id].clients, function(n) {
+                            n.emit('winner', {
+                                userId: index
+                            });
+                        });
+                    } else {
+                        // Broadcast winner
+                        _.forEach(rooms[message.id].clients, function(n) {
+                            n.emit('winnerDealer');
+                        });
+                    }
+                    
+                }
+
+                rooms[message.id].lastStand = message.userId;                
                 // Broadcast next turn
                 rooms[message.id].turn = (rooms[message.id].turn + 1) % rooms[message.id].players;
                 _.forEach(rooms[message.id].clients, function(n) {

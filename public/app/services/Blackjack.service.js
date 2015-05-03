@@ -95,6 +95,10 @@ angular.module('BlackjackApp')
             toaster.pop('success', 'Winner', 'Player ' + (message.userId + 1) + ' has won!');
         });
 
+        BlackjackSocket.on('winnerDealer', function (message) {
+            toaster.pop('error', 'You Lose', 'The dealer has won!');
+        });
+
         BlackjackSocket.on('blackjack', function (message) {
             toaster.pop('success', 'Blackjack', 'Player ' + (message.userId + 1) + ' has won!');
         });

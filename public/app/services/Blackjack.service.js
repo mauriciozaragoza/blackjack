@@ -91,6 +91,14 @@ angular.module('BlackjackApp')
         };
 
         // LISTENERS
+        BlackjackSocket.on('winner', function (message) {
+            toaster.pop('success', 'Winner', 'Player ' + (message.userId + 1) + ' has won!');
+        });
+
+        BlackjackSocket.on('blackjack', function (message) {
+            toaster.pop('success', 'Blackjack', 'Player ' + (message.userId + 1) + ' has won!');
+        });
+
         BlackjackSocket.on('bust', function (message) {
             toaster.pop('error', 'Busted', 'Player ' + (message.userId + 1) + ' has been busted!');
         });

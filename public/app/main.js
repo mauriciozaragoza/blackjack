@@ -7,5 +7,6 @@
 angular.module('BlackjackApp', [
     'ngAnimate',
     'btford.socket-io',
-    'ui.bootstrap'
+    'ui.bootstrap',
+    'toaster'
 ]);

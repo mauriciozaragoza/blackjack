@@ -6,7 +6,7 @@ angular.module('BlackjackApp')
     .factory('BlackjackSocket', ['socketFactory', function (socketFactory) {
         return socketFactory();
     }])
-    .factory('Blackjack', ['BlackjackSocket', '$rootScope', function (BlackjackSocket, $rootScope) {
+    .factory('Blackjack', ['BlackjackSocket', '$rootScope', 'toaster', function (BlackjackSocket, $rootScope, toaster) {
         var out = {
             dealer: {
                 cards: []
@@ -22,12 +22,16 @@ angular.module('BlackjackApp')
 
             hit: function () {
                 BlackjackSocket.emit('hit', {
+                    id: out.roomId,
                     userId: out.currentPlayerIndex
                 });
             },
 
             stand: function () {
-                console.log('stand');
+                BlackjackSocket.emit('stand', {
+                    id: out.roomId,
+                    userId: out.currentPlayerIndex
+                });
             },
 
             start: function () {
@@ -87,8 +91,17 @@ angular.module('BlackjackApp')
         };
 
         // LISTENERS
+        BlackjackSocket.on('bust', function (message) {
+            toaster.pop('error', 'Busted', 'Player ' + (message.userId + 1) + ' has been busted!');
+        });
+
         BlackjackSocket.on('turn', function (message) {
+            console.log('turn', message);
             out.turn = message.turn;
+        });
+
+        BlackjackSocket.on('turnError', function () {
+            toaster.pop('error', 'It\'s not your turn');
         });
 
         BlackjackSocket.on('dealerHand', function (message) {
@@ -96,11 +109,13 @@ angular.module('BlackjackApp')
         });
 
         BlackjackSocket.on('playerHand', function (message) {
+            console.log('playerHand', message);
             out.players[message.userId].cards = message.hand;
         });
 
         BlackjackSocket.on('playercount', function (message) {
             console.log('playercount', message);
+            toaster.pop('note', 'Join', 'A player has joined');
             out.playerCount = message.playercount;
         });
 

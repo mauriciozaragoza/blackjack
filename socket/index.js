@@ -146,8 +146,8 @@ module.exports = function(io) {
                 
                 // Broadcast the given card
                 _.forEach(rooms[message.id].clients, function(n) {
-                    n.emit('hit', {
-                        card: newCard,
+                    n.emit('playerHand', {
+                        playerHand: rooms[message.id].game.playersHand[message.userId].getHand(),
                         userId: message.userId
                     });
                 });
@@ -164,7 +164,7 @@ module.exports = function(io) {
                         });
                     }
                 }
-                
+
                 // Check if the player has a blackjack and broadcast it if so
                 if (rooms[message.id].game.playersHand[message.userId].isBlackJack()) {
                     _.forEach(rooms[message.id].clients, function(n) {
@@ -175,7 +175,12 @@ module.exports = function(io) {
                 }
 
                 // Broadcast next turn
-                rooms[message.id].turn = (rooms[message.id].turn + 1) % rooms[message.id].players;
+                var c = 1;
+                rooms[message.id].turn = (rooms[message.id].turn + c) % rooms[message.id].players;
+                while (rooms[message.id].game.playerHand[rooms[message.id].turn].isBust()) {
+                    rooms[message.id].turn = (rooms[message.id].turn + c) % rooms[message.id].players;
+                    c++;
+                }
                 _.forEach(rooms[message.id].clients, function(n) {
                     n.emit('turn', {
                         turn: rooms[message.id].turn
